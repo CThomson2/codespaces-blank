@@ -42,9 +42,12 @@ export class Motion extends Sensor {
         : accelerometerReading;
     accelerometerReading += Utilities.gaussianRandom(this.rms_noise);
     // Set instance vars to current values using dv*dt and dx*dt
-    this.acceleration = accelerometerReading;
-    this.velocity += this.acceleration * this.sampling_time;
+    // Use trapezoidal rule to estimate velocity and displacement
+    const avgAcceleration = (accelerometerReading + this.acceleration) / 2;
+    this.velocity += avgAcceleration * this.sampling_time;
     this.displacement += this.velocity * this.sampling_time
+    // Finally, update the acceleration value
+    this.acceleration = accelerometerReading;
     // Return the three variables of interest
     return {
       acceleration: this.acceleration,

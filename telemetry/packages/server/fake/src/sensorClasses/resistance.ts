@@ -29,7 +29,7 @@ export class Resistance extends Temperature {
    */
   getData(t: number): Readings {
     if(!Sensor.isSampled['temperature']) {
-      this.temperature = Utilities.average(super.getData(t));
+      this.temperature = Utilities.average(Object.values(super.getData(t)));
       Sensor.isSampled['temperature'] = true;
     }
 

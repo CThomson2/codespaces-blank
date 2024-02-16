@@ -4,8 +4,9 @@ import { RangeMeasurement } from ".";
 // for measurement objects which represent physical sensors
 // export type LiveReading = Omit<RangeMeasurement, 'name'> & {
 export type LiveReading = RangeMeasurement & {
-    quantity: number;
-    readings: Readings;  // measurements it provides; e.g. accelerometer gives values for acceleration, displacement and velocity (latter two indirectly)
+  quantity: number; // don't think this is used anywhere or needed, just use .length
+  // unique variable readinfgs it provides; e.g. accelerometer gives values for acceleration, displacement and velocity (latter two indirectly)
+  readings: Readings;
 }
 
 export type SensorData = Record<string, LiveReading>

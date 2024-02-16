@@ -1,5 +1,4 @@
-import { Readings } from '..';
-
+// No imports, this file contains pure, general functions 
 export class Utilities {
   /** Greatest common divisor */
   public static gcd(nums: number[]): number {
@@ -68,10 +67,7 @@ export class Utilities {
    * @returns arithmetic average
    */
   public static average(values: number[]): number {
-    // console.log('average temp: ', values.reduce((acc, val) => acc + val) / values.length);
-    return (
-      values.reduce((acc, val) => acc + val) / values.length
-    );
+    return values.reduce((acc, c) => acc + c) / values.length;
   }
 
   /**
@@ -87,7 +83,10 @@ export class Utilities {
     steadyState: number, // around 95% of max velocity giving a 5% margin for noise fluctuations
     growthRate: number, // exponential growth rate factor
     timeOfInflection: number, // time at which second derivative reaches a stationary point
-  ): any {
-    return steadyState / (1 + Math.exp(-growthRate * (t - timeOfInflection)));
+  ): number {
+    // round result for legibility
+    return parseFloat(
+      (steadyState / (1 + Math.exp(-growthRate * (t - timeOfInflection)))).toFixed(2)
+    );
   }
 }

@@ -7,7 +7,9 @@ export class Temperature extends Sensor {
 
   constructor(data: LiveReading) {
     super(data);
+    // Set initial temperature value upon instantiation
     this.temp_init = Utilities.average(Object.values(data.readings)); // initial temperature
+    // Dynamic value used for reference by any sub-class(es)
     this.temperature = this.temp_init; // dynamic value, set to initial temp. upon instantiation
   }
 

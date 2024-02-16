@@ -17,6 +17,17 @@ export class SensorManager {
   // Mqtt client
   private client: mqtt.MqttClient;
 
+   // Sensor dependencies (sub-classes)
+   private sensorDependencies: Record<string, string[]> = {
+    motion: [],
+    keyence: ['motion'],
+    temperature: ['motion'], // possibly pressure too, avoid circular logic though
+    pressure: ['motion', 'temperature'],
+    resistance: ['motion', 'temperature'],
+    magnetism: ['motion'],
+    levitation: ['motion', 'magnetism'],
+  }
+
   /**
    * Single instantiation of this class for each run
    * @param sensorsToRun user-defined array of sensor names to be run in the current simulation. The exclusion
@@ -26,7 +37,7 @@ export class SensorManager {
    */
   constructor(private sensorsToRun: string[]) {
     // Create sensor instances
-    this.instantiateSensors();
+    this.instantiateSensors(sensorsToRun);
     // Store the sampling times for the current run's sensor type in accessible object
     // const samplingTimes: Record<string, number> = {};
     this.sensorsToRun.forEach((name: string) => {
@@ -51,6 +62,15 @@ export class SensorManager {
 
     console.log(`\nthis.sensors:`, this.sensors);
     const simulationInterval = setInterval(() => {
+      // Increment time by the predefined interval
+      // Occurs before iteration as initial values (at t = 0) are already defined
+      this.globalTime += interval;
+      if (this.globalTime >= runTime) {
+        clearInterval(simulationInterval);
+        console.log('Simulation complete');
+        process.exit(0);
+      }
+
       // Preset all 'sampled' flags to false
       this.resetSampledState();
 
@@ -68,12 +88,12 @@ export class SensorManager {
 
           // Publish each of the current sensor type's reading values under the topic of
           //   its corresponding measurement key to the MQTT broker
-          Object.entries(readings).forEach(([measurement, value]) => {
-            this.publishData(measurement, value.toString());
-          });
+          // Object.entries(readings).forEach(([measurement, value]) => {
+          //   this.publishData(measurement, value.toString());
+          // });
 
           // this.logData(readings);
-          console.log(readings);
+          console.log(`${sensor} readings:`, readings);
         }
 
         console.log(`Time: ${this.globalTime}`);
@@ -81,13 +101,6 @@ export class SensorManager {
         // So those which haven't been sampled will remain at their last known value
       });
 
-      // Increment time by the predefined interval
-      this.globalTime += interval;
-      if (this.globalTime >= runTime) {
-        clearInterval(simulationInterval);
-        console.log('Simulation complete');
-        process.exit(0);
-      }
     }, interval);
   }
 
@@ -99,12 +112,25 @@ export class SensorManager {
   }
 
   // Instantiate sensors with their respective data and store instances in array
-  private instantiateSensors(): void {
-    for (const sensorType in sensorData) {
-      this.sensors.push(
-        // An array data type is used to preserve order of sensor instances
-        new sensors[sensorType](sensorData[sensorType]),
-      );
+   // Create instances of those selected by user and any parent-class sensors
+  // An array data type is used to preserve order of sensor instances
+  private instantiateSensors(sensorsToRun: string[]): void {
+    // Record added sensors as strings in unique set
+    const activeSensors: Set<string> = new Set();
+    // Add dependent sensors first as their instance props are used in subclass constructors
+    for (const sensorType of sensorsToRun) {
+      if (!activeSensors.has(sensorType)) {
+        this.sensors.push( 
+          ...this.sensorDependencies[sensorType]
+            .filter((dpndSensor: string) => !activeSensors.has(dpndSensor))
+            .map((dpndSensor: string) =>
+              new sensors[dpndSensor](sensorData[dpndSensor])),
+          new sensors[sensorType](sensorData[sensorType])
+        );
+        console.log(`${sensorType} dependencies:\n`);
+        console.log([...this.sensorDependencies[sensorType]]);
+        activeSensors.add(sensorType);
+      }
     }
   }
 
