@@ -67,9 +67,10 @@ export class Utilities {
    * @param values numbers to average
    * @returns arithmetic average
    */
-  public static average(values: Readings): number {
+  public static average(values: number[]): number {
+    // console.log('average temp: ', values.reduce((acc, val) => acc + val) / values.length);
     return (
-      Object.values(values).reduce((acc, val) => acc + val, 0) / values.length
+      values.reduce((acc, val) => acc + val) / values.length
     );
   }
 

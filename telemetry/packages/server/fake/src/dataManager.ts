@@ -33,7 +33,7 @@ export class SensorManager {
       this.samplingTimes[name] = sensorData[name].sampling_time;
     });
 
-    this.client = mqtt.connect('mqtt://localhost:1883');
+    // this.client = mqtt.connect('mqtt://localhost:1883');
   }
 
   /**
@@ -49,7 +49,7 @@ export class SensorManager {
     // Run setInterval to generate and upload the data
     // This essentially acts as a while loop, but using real time (eliminating the chance of inifintie loops)
 
-    console.log(`this.sensors:`, this.sensors);
+    console.log(`\nthis.sensors:`, this.sensors);
     const simulationInterval = setInterval(() => {
       // Preset all 'sampled' flags to false
       this.resetSampledState();

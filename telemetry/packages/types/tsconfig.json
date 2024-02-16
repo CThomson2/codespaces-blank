@@ -4,6 +4,7 @@
     "strict": true,
     "declaration": true,
     "declarationMap": true,
+    "target": "es2017",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,

@@ -3,12 +3,12 @@ import { LiveReading, Readings, Utilities } from '../../index';
 
 export class Temperature extends Sensor {
   protected temperature: number;
-  protected T_init: number;
+  protected temp_init: number;
 
   constructor(data: LiveReading) {
     super(data);
-    this.T_init = Utilities.average(data.readings); // initial temperature
-    this.temperature = this.T_init; // dynamic value, set to initial temp. upon instantiation
+    this.temp_init = Utilities.average(Object.values(data.readings)); // initial temperature
+    this.temperature = this.temp_init; // dynamic value, set to initial temp. upon instantiation
   }
 
   getData(t: number): Readings {
